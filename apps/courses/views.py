@@ -3,27 +3,43 @@ from .serializers import CourseSerializer
 from .models import Course
 from rest_framework import generics,status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
-# a create class that creates Courses
-class CreateAPIView(generics.CreateAPIView):
+
+class ListCreateAPIView(generics.ListCreateAPIView):
+    """
+        This generic class list's all courses and create's a new course 
+    """
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
 
 
-create_view = CreateAPIView.as_view()
+create_List_view = ListCreateAPIView.as_view()
 
-class ListAPIView(generics.ListAPIView):
-    serializer_class = CourseSerializer
-    queryset = Course.objects.all()
+class DetailCourse(APIView):
+
+    """ A view that get's a specified user course by looking up an id  """
+
+    def get(self,request,pk = None):
+        if pk is not None:
+            qs = get_object_or_404(Course,id = pk)        # qs = Course.objects.get(id = pk)
+            serializer = CourseSerializer(qs)
+            return Response(serializer.data)
+        return Response({"error":"Invalid request"},status=400)
+detail_view = DetailCourse.as_view()
+        
+        
 
 
-list_view = ListAPIView.as_view()
 
 class DeleteAPIView(generics.DestroyAPIView):
+    """
+        A class that delete's an existing course 
+    """
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
-    lookup_field = "pk"
+    
 
     def get_object(self):
         # Use the primary key (pk) to retrieve the object
@@ -31,7 +47,7 @@ class DeleteAPIView(generics.DestroyAPIView):
 
         
         return obj
-        return redirect('Course/list/')
+        
         
         
         
@@ -42,6 +58,10 @@ delete_view = DeleteAPIView.as_view()
 
 
 class UpdateAPIView(generics.UpdateAPIView):
+    """ 
+        this class alters existing instance of the object/course 
+     
+    """
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
     lookup_field = "pk"

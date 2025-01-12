@@ -6,5 +6,7 @@ class Course(models.Model):
     cat_two = models.IntegerField()
     fat = models.IntegerField()
     total = models.IntegerField()
+    def __str__(self):
+        return self.title
 
  

@@ -3,24 +3,35 @@ from .serializers import AssignmentSerializer
 from .models import Assignment
 from rest_framework import generics,status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
-# a create class that creates assignments
-class CreateAPIView(generics.CreateAPIView):
+class ListCreateAPIView(generics.ListCreateAPIView):
+    """
+        This generic class list's all courses and create's a new course 
+    """
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
 
 
-create_view = CreateAPIView.as_view()
+create_List_view = ListCreateAPIView.as_view()
 
-class ListAPIView(generics.ListAPIView):
-    serializer_class = AssignmentSerializer
-    queryset = Assignment.objects.all()
+class AssignementDetail(APIView):
+    """ A view that get's a specified user course by looking up an id  """
+    def get(self,request,pk = None):
+        if pk is not None:
+            qs = get_object_or_404(Assignment,id = pk)        # qs = Course.objects.get(id = pk)
+            serializer = AssignmentSerializer(qs)
+            return Response(serializer.data)
+        return Response({"error":"Invalid request"},status=400)
+detail_view = AssignementDetail.as_view()
 
 
-list_view = ListAPIView.as_view()
 
 class DeleteAPIView(generics.DestroyAPIView):
+    """
+        A class that delete's an existing course 
+    """
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
     lookup_field = "pk"
@@ -31,7 +42,6 @@ class DeleteAPIView(generics.DestroyAPIView):
 
         
         return obj
-        return redirect('assignment/list/')
         
         
         
@@ -42,6 +52,11 @@ delete_view = DeleteAPIView.as_view()
 
 
 class UpdateAPIView(generics.UpdateAPIView):
+    """ 
+    this class alters existing instance of the object/course 
+     
+    """
+
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
     lookup_field = "pk"
